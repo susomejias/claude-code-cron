@@ -25,6 +25,6 @@ The entire project is a single workflow file:
 
 - Auth precedence: `ANTHROPIC_API_KEY` takes over `CLAUDE_CODE_OAUTH_TOKEN` if both are set (CLI behavior).
 - `timeout-minutes: 5` caps each run — the prompt + response should complete well within this.
-- The CLI installation is cached weekly via `actions/cache` (key: `claude-code-{os}-{year}-{week}`) so most runs skip the download entirely.
+- The CLI installation is cached via `actions/cache` keyed by Node.js version — cache auto-invalidates when Node updates.
 - `workflow_dispatch` allows a one-off prompt override without changing the repo variable.
 - GitHub Actions cron runs on UTC and may be delayed during high load.
