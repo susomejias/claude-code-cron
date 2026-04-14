@@ -47,6 +47,12 @@ CLAUDE_PROMPT=Review open issues in this repo and suggest which ones to tackle n
 
 You can also override it for a single run via **Actions > Claude Code Cron > Run workflow**.
 
+### Model
+
+Optionally add `CLAUDE_MODEL` as a **repository variable** to choose which model to use. If not set, Claude Code uses its default model.
+
+Check the [Anthropic docs](https://docs.anthropic.com/en/docs/about-claude/models) for the latest available model IDs.
+
 ### Cron schedule
 
 Edit the `cron` expression in `.github/workflows/claude-cron.yml`:

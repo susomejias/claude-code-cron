@@ -24,6 +24,11 @@ jobs:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
     steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'node'
+
       - name: Get week number (for cache key)
         id: week
         run: echo "value=$(date +'%Y-%U')" >> "$GITHUB_OUTPUT"
@@ -44,6 +49,7 @@ jobs:
         run: echo "$HOME/.claude/bin" >> "$GITHUB_PATH"
 
       - name: Run Claude Code
+        shell: bash -eo pipefail {0}
         run: |
           PROMPT="${{ inputs.prompt || vars.CLAUDE_PROMPT }}"
           if [ -z "$PROMPT" ]; then
@@ -52,4 +58,8 @@ jobs:
             echo "or pass it via the workflow_dispatch prompt input."
             exit 1
           fi
-          claude -p "$PROMPT"
+          MODEL_FLAG=""
+          if [ -n "${{ vars.CLAUDE_MODEL }}" ]; then
+            MODEL_FLAG="--model ${{ vars.CLAUDE_MODEL }}"
+          fi
+          claude -p "$PROMPT" $MODEL_FLAG

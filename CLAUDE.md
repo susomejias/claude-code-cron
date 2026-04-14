@@ -17,6 +17,7 @@ The entire project is a single workflow file:
 | Variable | Type | Description |
 |---|---|---|
 | `CLAUDE_PROMPT` | Repository variable | Task/message to send to Claude Code |
+| `CLAUDE_MODEL` | Repository variable | Model ID (optional, uses CLI default if unset) |
 | `CLAUDE_CODE_OAUTH_TOKEN` | Secret | Token from `claude setup-token` (Pro/Max quota, 1 year) |
 | `ANTHROPIC_API_KEY` | Secret | Anthropic API key (per-token billing) |
 
