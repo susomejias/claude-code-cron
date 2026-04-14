@@ -78,3 +78,18 @@ Formula: `UTC hour = local hour - offset`. For example, 6:00 at UTC+2 → `6 - 2
 Note: if your region observes daylight saving time, the UTC equivalent shifts by 1 hour twice a year — there is no way to handle this automatically in GitHub Actions.
 
 GitHub Actions cron may also be delayed by a few minutes during periods of high load.
+
+## Syncing with the template
+
+Repos created from a template don't automatically receive updates. To pull in the latest changes:
+
+```bash
+# Add the template as a remote (one-time)
+git remote add template https://github.com/susomejias/claude-code-cron.git
+
+# Fetch and merge the latest changes
+git fetch template
+git merge template/main --allow-unrelated-histories
+```
+
+Resolve any conflicts, then commit and push. You can repeat the fetch + merge step anytime the template is updated.
