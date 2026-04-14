@@ -1,0 +1,55 @@
+name: Claude Code Cron
+
+on:
+  # schedule:
+  #   - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      prompt:
+        description: 'Override prompt (leave empty to use CLAUDE_PROMPT repo variable)'
+        required: false
+        type: string
+
+jobs:
+  run-claude:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      NODE_NO_WARNINGS: '1'
+      # Auth — set one of these two secrets in your repo settings.
+      # The Claude Code CLI picks them up automatically from the environment.
+      # ANTHROPIC_API_KEY: Anthropic API key (per-token billing)
+      # CLAUDE_CODE_OAUTH_TOKEN: generated via `claude setup-token` (Pro/Max subscription quota, 1 year)
+      # If both are set, ANTHROPIC_API_KEY takes precedence.
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+    steps:
+      - name: Get week number (for cache key)
+        id: week
+        run: echo "value=$(date +'%Y-%U')" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Claude Code
+        id: cache-claude
+        uses: actions/cache@v4
+        with:
+          path: ~/.claude
+          key: claude-code-${{ runner.os }}-${{ steps.week.outputs.value }}
+          restore-keys: claude-code-${{ runner.os }}-
+
+      - name: Install Claude Code
+        if: steps.cache-claude.outputs.cache-hit != 'true'
+        run: curl -fsSL https://claude.ai/install.sh | bash
+
+      - name: Add Claude Code to PATH
+        run: echo "$HOME/.claude/bin" >> "$GITHUB_PATH"
+
+      - name: Run Claude Code
+        run: |
+          PROMPT="${{ inputs.prompt || vars.CLAUDE_PROMPT }}"
+          if [ -z "$PROMPT" ]; then
+            echo "Error: CLAUDE_PROMPT is not configured."
+            echo "Set it as a repository variable (Settings > Secrets and variables > Variables)"
+            echo "or pass it via the workflow_dispatch prompt input."
+            exit 1
+          fi
+          claude -p "$PROMPT"
